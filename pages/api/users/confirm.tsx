@@ -18,4 +18,6 @@ async function handler(
   await client.token.deleteMany({ where: { userId: exist.userId } });
   res.json({ ok: true });
 }
-export default withApiSession(withHandler("POST", handler));
+export default withApiSession(
+  withHandler({ method: "POST", handler, isPrivate: false })
+);
