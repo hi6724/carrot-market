@@ -6,8 +6,9 @@ export default function useUser() {
   const { data, error } = useSWR("/api/users/me");
 
   const router = useRouter();
+  console.log("DATA:", data);
   useEffect(() => {
-    if (data && !data.ok) {
+    if (!data || !data.ok) {
       router.replace("/enter");
     }
   }, [data, router]);
