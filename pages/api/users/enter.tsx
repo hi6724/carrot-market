@@ -47,6 +47,7 @@ async function handler(
     // });
     // console.log(email);
   }
+  console.log(payload);
   return res.json({
     ok: true,
   });
