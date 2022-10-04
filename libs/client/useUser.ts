@@ -8,7 +8,7 @@ export default function useUser() {
   const router = useRouter();
   console.log("DATA:", data);
   useEffect(() => {
-    if (!data || !data.ok) {
+    if (data && !data.ok) {
       router.replace("/enter");
     }
   }, [data, router]);
