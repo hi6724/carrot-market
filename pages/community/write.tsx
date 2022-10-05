@@ -1,3 +1,4 @@
+import useCoords from "@libs/client/useCoords";
 import useMutation from "@libs/client/useMutation";
 import { Post } from "@prisma/client";
 import type { NextPage } from "next";
@@ -19,12 +20,13 @@ interface WriteResponse {
 
 const Write: NextPage = () => {
   const router = useRouter();
+  const { latitude, longitude } = useCoords();
   const { register, handleSubmit } = useForm<WriteForm>();
   const [post, { loading, data }] = useMutation<WriteResponse>("/api/posts");
 
   const onValid = (data: WriteForm) => {
     if (loading) return;
-    post(data);
+    post({ ...data, latitude, longitude });
   };
   useEffect(() => {
     if (data && data.ok) {
