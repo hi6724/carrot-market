@@ -14,6 +14,15 @@ async function handler(
 
   const stream = await client.stream.findUnique({
     where: { id: +id!.toString() },
+    include: {
+      messages: {
+        select: {
+          id: true,
+          message: true,
+          user: { select: { avatar: true, id: true } },
+        },
+      },
+    },
   });
   res.json({ ok: true, stream });
 }
