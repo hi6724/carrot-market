@@ -8,6 +8,7 @@ import Button from "../../components/button";
 import Layout from "../../components/layout";
 import useMutation from "@libs/client/useMutation";
 import { cls } from "@libs/client/utils";
+import Image from "next/image";
 
 interface ProductWithUser extends Product {
   user: User;
@@ -34,9 +35,32 @@ const ItemDetail: NextPage = () => {
     <Layout canGoBack>
       <div className="px-4  py-4">
         <div className="mb-8">
-          <div className="h-96 bg-slate-300" />
+          {data?.product?.image ? (
+            <Image
+              src={`https://imagedelivery.net/H377KTV0gNyVNndi5licRQ/${data?.product?.image}/public`}
+              // src={`https://mblogthumb-phinf.pstatic.net/MjAxODA2MjRfMjgw/MDAxNTI5ODMzODE4ODM5.Eo1tQYXKzifDFXv5gnmMFS9Nldy2aUxxrSzIsLS3kUYg.l_i4k9DmsTlixQcOxp9ywSEXIMVKELHWPFKVV62VHz8g.JPEG.amykims/53.jpg?type=w800`}
+              className=" bg-slate-300 object-cover"
+              width="30%"
+              height="17%"
+              layout="responsive"
+              objectFit="contain"
+              alt=""
+            />
+          ) : (
+            <div className="h-96 bg-slate-300" />
+          )}
           <div className="flex cursor-pointer py-3 border-t border-b items-center space-x-3">
-            <div className="w-12 h-12 rounded-full bg-slate-300" />
+            {data?.product?.user?.avatar ? (
+              <Image
+                width={46}
+                height={46}
+                className="w-12 h-12 rounded-full bg-slate-300"
+                src={`https://imagedelivery.net/H377KTV0gNyVNndi5licRQ/${data?.product?.user?.avatar}/avatar`}
+                alt=""
+              />
+            ) : (
+              <div className="w-12 h-12 rounded-full bg-slate-300" />
+            )}
             <div>
               <p className="text-sm font-medium text-gray-700">
                 {data?.product?.user?.name}

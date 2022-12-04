@@ -1,11 +1,18 @@
 import type { NextPage } from "next";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Button from "@components/button";
 import Input from "@components/input";
 import useMutation from "@libs/client/useMutation";
 import { cls } from "@libs/client/utils";
 import { useRouter } from "next/router";
+
+import dynamic from "next/dynamic";
+
+const Test = dynamic(() => import("@components/test"), {
+  ssr: false,
+  suspense: true,
+});
 
 interface EnterForm {
   email?: string;
@@ -60,7 +67,12 @@ const Enter: NextPage = () => {
 
   return (
     <div className="mt-16 px-4">
-      <h3 className="text-3xl font-bold text-center">Enter to Carrot</h3>
+      <h3
+        style={{ fontFamily: "Noto Sans KR" }}
+        className="text-3xl font-bold text-center"
+      >
+        Enter to Carrot
+      </h3>
       <div className="mt-12">
         {data?.ok ? (
           <form
@@ -125,14 +137,19 @@ const Enter: NextPage = () => {
                 />
               ) : null}
               {method === "phone" ? (
-                <Input
-                  register={register("phone")}
-                  name="phone"
-                  label="Phone number"
-                  type="number"
-                  kind="phone"
-                  required
-                />
+                <>
+                  <Suspense fallback="Loading...">
+                    <Test />
+                  </Suspense>
+                  <Input
+                    register={register("phone")}
+                    name="phone"
+                    label="Phone number"
+                    type="number"
+                    kind="phone"
+                    required
+                  />
+                </>
               ) : null}
               {method === "email" ? (
                 <Button text={loading ? "Loading" : "Get login link"} />
