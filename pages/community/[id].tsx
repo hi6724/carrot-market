@@ -1,12 +1,13 @@
 import useMutation from "@libs/client/useMutation";
 import { cls } from "@libs/client/utils";
 import { Answer, Post, User } from "@prisma/client";
-import type { NextPage } from "next";
+import type { GetStaticPaths, GetStaticProps, NextPage } from "next";
+import client from "@libs/server/client";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import useSWR from "swr";
+import useSWR, { SWRConfig } from "swr";
 import Layout from "../../components/layout";
 import TextArea from "../../components/textarea";
 
@@ -97,7 +98,7 @@ const CommunityPostDetail: NextPage = () => {
           <div className="w-10 h-10 rounded-full bg-slate-300" />
           <div>
             <p className="text-sm font-medium text-gray-700">
-              {data?.post.user.name}
+              {data?.post?.user?.name}
             </p>
             <Link href={`/users/profiles/${data?.post?.user?.id}`}>
               <a className="text-xs font-medium text-gray-500">
@@ -133,7 +134,7 @@ const CommunityPostDetail: NextPage = () => {
                   d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                 ></path>
               </svg>
-              <span>궁금해요 {data?.post._count.wondering}</span>
+              <span>궁금해요 {data?.post._count?.wondering}</span>
             </button>
             <span className="flex space-x-2 items-center text-sm">
               <svg
@@ -150,7 +151,7 @@ const CommunityPostDetail: NextPage = () => {
                   d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
                 ></path>
               </svg>
-              <span>답변 {data?.post._count.answers}</span>
+              <span>답변 {data?.post._count?.answers}</span>
             </span>
           </div>
         </div>
@@ -186,4 +187,59 @@ const CommunityPostDetail: NextPage = () => {
   );
 };
 
-export default CommunityPostDetail;
+export const getStaticProps: GetStaticProps = async (ctx) => {
+  console.log(process.env.NODE_ENV);
+  if (!ctx?.params?.id) {
+    return {
+      props: {},
+    };
+  }
+
+  const post = await client.post.findUnique({
+    where: { id: +ctx.params.id!.toString() },
+    include: {
+      answers: {
+        select: {
+          answer: true,
+          id: true,
+          user: {
+            select: { id: true, name: true, avatar: true },
+          },
+        },
+      },
+      user: { select: { id: true, name: true, avatar: true } },
+      _count: { select: { answers: true, wondering: true } },
+    },
+  });
+
+  return {
+    props: {
+      post: JSON.parse(JSON.stringify(post)),
+      isWondering: false,
+    },
+  };
+};
+export const getStaticPaths: GetStaticPaths = () => {
+  return {
+    paths: [],
+    fallback: "blocking",
+  };
+};
+
+const Page: NextPage<CommunityPostResponse> = ({ isWondering, post }) => {
+  console.log("HERE", post);
+  const url = `/api/posts/${post.id}`;
+  return (
+    <SWRConfig
+      value={{
+        fallback: {
+          [url]: { post, isWondering, ok: true },
+        },
+      }}
+    >
+      <CommunityPostDetail />
+    </SWRConfig>
+  );
+};
+
+export default Page;
