@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 
 interface ItemProps {
@@ -22,10 +21,7 @@ export default function Item({
     <Link href={`/products/${id}`}>
       <a className="flex px-4 pt-5 cursor-pointer justify-between">
         <div className="flex space-x-4">
-          <Image
-            width={300}
-            height={300}
-            alt=""
+          <img
             src={`https://imagedelivery.net/H377KTV0gNyVNndi5licRQ/${image}/avatar`}
             className="w-20 h-20 bg-gray-400 rounded-md"
           />
