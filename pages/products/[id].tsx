@@ -188,3 +188,4 @@ export const getStaticProps: GetStaticProps = async (ctx) => {
     },
   };
 };
+export default ItemDetail;
