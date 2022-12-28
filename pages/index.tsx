@@ -19,7 +19,7 @@ const Home: NextPage = () => {
   const { data } = useSWR<ProductResponse>("/api/products");
 
   return (
-    <Layout title="홈" hasTabBar>
+    <Layout title="호오오오오오오오옴" hasTabBar>
       <div className="flex flex-col space-y-5 divide-y">
         {data?.products?.map((product, i) => (
           <Item
