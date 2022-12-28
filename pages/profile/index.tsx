@@ -7,6 +7,7 @@ import Link from "next/link";
 import useSWR, { SWRConfig } from "swr";
 import Layout from "../../components/layout";
 import client from "@libs/server/client";
+import Image from "next/image";
 
 interface ReviewWithUser extends Review {
   createdBy: User;
@@ -25,7 +26,10 @@ const Profile: NextPage = () => {
       <div className="px-4">
         <div className="flex items-center mt-4 space-x-3">
           {user?.avatar ? (
-            <img
+            <Image
+              width={300}
+              height={300}
+              alt=""
               src={`https://imagedelivery.net/H377KTV0gNyVNndi5licRQ/${user?.avatar}/avatar`}
               className="w-16 h-16 bg-slate-500 rounded-full"
             />
