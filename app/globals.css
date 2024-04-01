@@ -1,3 +1,25 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  a {
+    @apply text-violet-600;
+  }
+}
+
+@layer utilities {
+  .text-bigger-hello {
+    @apply text-3xl font-semibold;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply w-full bg-black h-10 text-white rounded-xl mt-10;
+  }
+}
+
+.my-container {
+  @apply flex items-center gap-5 odd:bg-gray-100 even:bg-cyan-100 rounded-xl border-b-2 p-2.5 pb-5 last:border-0 last:pb-2.5;
+}
