@@ -18,6 +18,7 @@ function Home() {
           </div>
         ))}
         <button className='btn'>HELLO BUTTON</button>
+        <input type='text' />
       </div>
     </main>
   );
