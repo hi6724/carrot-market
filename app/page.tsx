@@ -2,7 +2,7 @@ import React from 'react';
 
 function Home() {
   return (
-    <main className='h-screen flex items-center justify-center p-5 bg-gray-100'>
+    <main className='h-screen flex justify-center bg-hunmok pt-[60.5px] pb-hunmok '>
       <div className='bg-white shadow-lg p-5 rounded-3xl w-full max-w-screen-sm flex flex-col gap-3 '>
         {['Nico', 'Me', 'You', 'Yourself'].map((person, index) => (
           <div
