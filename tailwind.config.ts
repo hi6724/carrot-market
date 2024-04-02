@@ -7,18 +7,8 @@ const config: Config = {
     './app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
-    extend: {
-      padding: {
-        hunmok: '120px',
-      },
-      borderColor: {
-        hunmok: 'tomato',
-      },
-      backgroundColor: {
-        hunmok: 'tomato',
-      },
-    },
+    extend: {},
   },
-  plugins: [require('@tailwindcss/forms')],
+  plugins: [],
 };
 export default config;

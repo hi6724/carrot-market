@@ -1,26 +1,22 @@
+import Link from 'next/link';
 import React from 'react';
 
 function Home() {
   return (
-    <main className='h-screen flex justify-center bg-hunmok pt-[60.5px] pb-hunmok '>
-      <div className='bg-white shadow-lg p-5 rounded-3xl w-full max-w-screen-sm flex flex-col gap-3 '>
-        {['Nico', 'Me', 'You', 'Yourself'].map((person, index) => (
-          <div key={index} className='my-container group'>
-            <div className='size-10 bg-blue-400 rounded-full' />
-            <span className='text-lg font-medium group-hover:text-red-500  group-focus-within:bg-cyan-300'>
-              {person}
-            </span>
-            <div className='size-6  bg-red-500 text-white flex items-center justify-center rounded-full relative'>
-              <span className='z-10'>{index}</span>
-              <div className='size-6 animate-ping rounded-full bg-red-500 absolute' />
-            </div>
-            <a href='#'>hello</a>
-          </div>
-        ))}
-        <button className='btn'>HELLO BUTTON</button>
-        <input type='text' />
+    <div>
+      <div>
+        <span>🥕</span>
+        <h1>당근</h1>
+        <h2>당근 마켓에 어서오세요!</h2>
       </div>
-    </main>
+      <div>
+        <Link href={'/create-account'}>시작하기</Link>
+        <div>
+          <span>이미 계정이 있나요?</span>
+          <Link href={'/login'}>로그인</Link>
+        </div>
+      </div>
+    </div>
   );
 }
 
