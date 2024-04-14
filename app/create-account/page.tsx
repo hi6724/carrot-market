@@ -21,18 +21,27 @@ function CreateAccountPage() {
           placeholder='Username'
           type='text'
           required
+          errors={state?.fieldErrors.username}
         />
-        <FormInput type='email' name='email' placeholder='Email' required />
+        <FormInput
+          type='email'
+          name='email'
+          placeholder='Email'
+          required
+          errors={state?.fieldErrors.email}
+        />
         <FormInput
           type='password'
           name='password'
           placeholder='Password'
+          errors={state?.fieldErrors.password}
           required
         />
         <FormInput
           type='password'
           name='confirm_password'
           placeholder='confirmPassword'
+          errors={state?.fieldErrors.confirm_password}
           required
         />
         <FormButton text={'Create Account'} />
