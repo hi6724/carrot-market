@@ -13,21 +13,26 @@ function CreateAccountPage() {
         <h2 className='text-xl'>폼을 입력해주세요!</h2>
       </div>
       <form className='flex flex-col gap-3'>
-        <FormInput placeholder='Username' type='text' required errors={[]} />
-        <FormInput type='email' placeholder='Email' required errors={[]} />
+        <FormInput
+          name='username'
+          placeholder='Username'
+          type='text'
+          required
+        />
+        <FormInput type='email' name='email' placeholder='Email' required />
         <FormInput
           type='password'
+          name='password'
           placeholder='Password'
           required
-          errors={[]}
         />
         <FormInput
           type='password'
-          placeholder='Confirm Password'
+          name='Confirm'
+          placeholder='confirmPassword'
           required
-          errors={[]}
         />
-        <FormButton text={'Create Account'} loading={false} />
+        <FormButton text={'Create Account'} />
       </form>
       <SocialLogin />
     </div>
