@@ -2,12 +2,33 @@
 
 import { z } from 'zod';
 
-const formSchema = z.object({
-  username: z.string().min(3).max(10),
-  email: z.string().email(),
-  password: z.string().min(6),
-  confirm_password: z.string().min(6),
-});
+const checkUsername = (username: string) => !username.includes('potato');
+const checkPasswords = ({
+  password,
+  confirm_password,
+}: {
+  password: string;
+  confirm_password: string;
+}) => password === confirm_password;
+
+const formSchema = z
+  .object({
+    username: z
+      .string({
+        invalid_type_error: 'Username must be a string!',
+        required_error: 'Where is my username???',
+      })
+      .min(3, 'Way too short!!!')
+      .max(10, 'That is too looooong!')
+      .refine(checkUsername, 'No potato allowed'),
+    email: z.string().email(),
+    password: z.string().min(6),
+    confirm_password: z.string().min(6),
+  })
+  .refine(checkPasswords, {
+    message: 'Both passwords should be the same!',
+    path: ['confirm_password'],
+  });
 
 export async function createAccount(prevState: any, formData: FormData) {
   const data = {
