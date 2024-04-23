@@ -1,10 +1,12 @@
 'use server';
 
+import {
+  PASSWORD_MIN_LENGTH,
+  PASSWORD_REGEX,
+  PASSWORD_REGEX_ERROR,
+} from '@/lib/constants';
 import { z } from 'zod';
 
-const passwordRegex = new RegExp(
-  /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).+$/
-);
 const checkUsername = (username: string) => !username.includes('potato');
 const checkPasswords = ({
   password,
@@ -21,18 +23,13 @@ const formSchema = z
         invalid_type_error: '아이디는 문자로~',
         required_error: '아이디 어디?',
       })
-      .min(3, '넘 짧아요 3글자 이상')
-      .max(10, '넘 길어요 10자 이하')
       .transform((username) => `🔥${username}`)
       .refine(checkUsername, 'potato는 들어가면 안대유'),
     email: z.string().email('이메일 형식이 아니에요'),
     password: z
       .string()
-      .min(6)
-      .regex(
-        passwordRegex,
-        '비밀번호는 영어 대,소문자와 특수문자 숫자를 포함해야 합니다.'
-      ),
+      .min(PASSWORD_MIN_LENGTH)
+      .regex(PASSWORD_REGEX, PASSWORD_REGEX_ERROR),
     confirm_password: z.string().min(6),
   })
   .refine(checkPasswords, {
