@@ -5,9 +5,10 @@ import {
   PASSWORD_REGEX,
   PASSWORD_REGEX_ERROR,
 } from '@/lib/constants';
+import db from '@/lib/db';
 import { z } from 'zod';
+import bcrypt from 'bcrypt';
 
-const checkUsername = (username: string) => !username.includes('potato');
 const checkPasswords = ({
   password,
   confirm_password,
@@ -15,6 +16,22 @@ const checkPasswords = ({
   password: string;
   confirm_password: string;
 }) => password === confirm_password;
+
+const checkUniqueUsername = async (username: string) => {
+  const user = await db.user.findUnique({
+    where: { username },
+    select: { id: true },
+  });
+  return !Boolean(user);
+};
+
+const checkUniqueEmail = async (email: string) => {
+  const user = await db.user.findUnique({
+    where: { email },
+    select: { id: true },
+  });
+  return !Boolean(user);
+};
 
 const formSchema = z
   .object({
@@ -24,8 +41,12 @@ const formSchema = z
         required_error: '아이디 어디?',
       })
       .transform((username) => `🔥${username}`)
-      .refine(checkUsername, 'potato는 들어가면 안대유'),
-    email: z.string().email('이메일 형식이 아니에요'),
+      .refine(checkUniqueUsername, 'potato는 들어가면 안대유'),
+    email: z
+      .string()
+      .email('이메일 형식이 아니에요')
+      .toLowerCase()
+      .refine(checkUniqueEmail, '이메일 중복'),
     password: z
       .string()
       .min(PASSWORD_MIN_LENGTH)
@@ -44,10 +65,23 @@ export async function createAccount(prevState: any, formData: FormData) {
     password: formData.get('password'),
     confirm_password: formData.get('confirm_password'),
   };
-  const result = formSchema.safeParse(data);
+  const result = await formSchema.safeParseAsync(data);
   if (!result.success) {
     return result.error.flatten();
   } else {
-    console.log(result.data);
+    // hashpassword
+    const hashedPassword = await bcrypt.hash(result.data.password, 12);
+    // 저장
+    await db.user.create({
+      data: {
+        username: result.data.username,
+        email: result.data.email,
+        password: hashedPassword,
+      },
+      select: { id: true },
+    });
+    // login
+
+    // redirect
   }
 }
