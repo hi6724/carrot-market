@@ -11,6 +11,7 @@ import bcrypt from 'bcrypt';
 import { getIronSession } from 'iron-session';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import getSession from '@/lib/session';
 
 const checkPasswords = ({
   password,
@@ -50,10 +51,8 @@ const formSchema = z
       .email('이메일 형식이 아니에요')
       .toLowerCase()
       .refine(checkUniqueEmail, '이메일 중복'),
-    password: z
-      .string()
-      .min(PASSWORD_MIN_LENGTH)
-      .regex(PASSWORD_REGEX, PASSWORD_REGEX_ERROR),
+    password: z.string().min(PASSWORD_MIN_LENGTH),
+    // .regex(PASSWORD_REGEX, PASSWORD_REGEX_ERROR),
     confirm_password: z.string().min(6),
   })
   .refine(checkPasswords, {
@@ -85,11 +84,7 @@ export async function createAccount(prevState: any, formData: FormData) {
     });
     // login
     console.log(process.env.COOKIE_PASSWORD);
-    const cookie = await getIronSession(cookies(), {
-      cookieName: 'delicious-carrot',
-      password: process.env.COOKIE_PASSWORD!,
-    });
-    // @ts-ignore
+    const cookie = await getSession();
     cookie.id = user.id;
     await cookie.save();
     // redirect
