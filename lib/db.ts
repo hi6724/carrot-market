@@ -7,7 +7,6 @@ async function test() {
     where: { userId: 1 },
     include: { user: true },
   });
-  console.log(token);
 }
 
 test();
