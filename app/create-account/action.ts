@@ -94,6 +94,7 @@ export async function createAccount(prevState: any, formData: FormData) {
     const user = await db.user.create({
       data: {
         username: result.data.username,
+        nickname: result.data.username,
         email: result.data.email,
         password: hashedPassword,
       },

@@ -24,6 +24,7 @@ async function Profile() {
   return (
     <div>
       <h1>Welcome! {user?.username}</h1>
+      <h1>Welcome! {user?.email}</h1>
       <form action={logOut}>
         <button>Logout</button>
       </form>
