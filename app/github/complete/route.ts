@@ -1,63 +1,48 @@
-import db from '@/lib/db';
-import getSession from '@/lib/session';
+import { UserService } from './../../../lib/services/userService';
+import { loginSession } from '@/lib/session';
+import { v4 as uuidv4 } from 'uuid';
 import { notFound, redirect } from 'next/navigation';
 import { NextRequest, NextResponse } from 'next/server';
+import {
+  getGithubEmail,
+  getGithubToken,
+  getGithubUser,
+} from '@/lib/githubAuth';
 
 export async function GET(request: NextRequest) {
+  const userService = new UserService();
   const code = request.nextUrl.searchParams.get('code');
   if (!code) return notFound();
-  const accessTokenParams = new URLSearchParams({
-    client_id: process.env.GITHUB_CLIENT_ID!,
-    client_secret: process.env.GITHUB_CLIENT_SECRET!,
-    code,
-  }).toString();
-  const requestURL = `https://github.com/login/oauth/access_token?${accessTokenParams}`;
-  const { error, access_token } = await (
-    await fetch(requestURL, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-      },
-    })
-  ).json();
 
-  if (error) {
-    return NextResponse.redirect(new URL('/login', request.url));
-  }
+  const token = await getGithubToken(code);
+  const { github_id, nickname, avatar } = await getGithubUser(token);
+  const email = await getGithubEmail(token);
 
-  const { id, login, avatar_url } = await (
-    await fetch('https://api.github.com/user', {
-      headers: {
-        Authorization: `Bearer ${access_token}`,
-      },
-      cache: 'no-cache',
-    })
-  ).json();
-
-  let user = await db.user.findUnique({
-    where: {
-      github_id: `${id}`,
-    },
-    select: {
-      id: true,
-    },
+  const user = await userService.findFirst({
+    where: { OR: [{ github_id }, { email }] },
+    select: { github_id: true, id: true, email: true },
   });
 
   if (!user) {
-    user = await db.user.create({
+    const newUser = await userService.create({
       data: {
-        username: login,
-        github_id: `${id}`,
-        avatar: avatar_url,
-      },
-      select: {
-        id: true,
+        username: uuidv4(),
+        github_id,
+        email,
+        avatar,
+        nickname,
       },
     });
+    return userService.loginAndRedirect(newUser.id);
+  } else if (user.github_id === github_id) {
+    return userService.loginAndRedirect(user.id);
+  } else if (user.email === email && !user.github_id) {
+    await userService.update({
+      where: { email },
+      data: { github_id },
+    });
+    return userService.loginAndRedirect(user.id);
+  } else {
+    return redirect(`/login?email=${email}`);
   }
-
-  const session = await getSession();
-  session.id = user.id;
-  await session.save();
-  return redirect('/profile');
 }
