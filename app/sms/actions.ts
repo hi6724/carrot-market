@@ -12,10 +12,7 @@ import twilio from 'twilio';
 const phoneSchema = z
   .string()
   .trim()
-  .refine(
-    (phone) => validator.isMobilePhone(phone, 'ko-KR'),
-    'Wrong phone format'
-  );
+  .refine((phone) => validator.isMobilePhone(phone, 'ko-KR'), 'Wrong phone format');
 
 async function tokenExists(token: number) {
   const exists = await db.sMSToken.findUnique({
@@ -29,14 +26,11 @@ async function tokenExists(token: number) {
   return !!exists;
 }
 
-const tokenSchema = z.coerce
-  .number()
-  .min(100000)
-  .max(999999)
-  .refine(tokenExists, 'This token does not exist.');
+const tokenSchema = z.coerce.number().min(100000).max(999999).refine(tokenExists, 'This token does not exist.');
 
 interface ActionState {
   token: boolean;
+  phone?: string;
 }
 async function getToken() {
   const token = crypto.randomInt(100000, 999999).toString();
@@ -52,7 +46,7 @@ async function getToken() {
 }
 
 export async function smsLogin(prevState: ActionState, formData: FormData) {
-  const phone = formData.get('phone');
+  const phone = formData.get('phone') as string | undefined;
   const requestToken = formData.get('token');
   const userService = new UserService();
   if (!prevState.token) {
@@ -87,16 +81,18 @@ export async function smsLogin(prevState: ActionState, formData: FormData) {
         from: process.env.TWILIO_PHONE_NUMBER!,
         to: process.env.MY_PHONE_NUMBER!,
       });
-      return { token: true };
+      return { token: true, phone };
     }
   }
 
   const result = await tokenSchema.safeParseAsync(requestToken);
-  if (!result.success) return { token: true, error: result.error.flatten() };
+  if (!result.success) return { ...prevState, error: result.error.flatten() };
   const token = await db.sMSToken.findUnique({
     where: { token: result.data.toString() },
-    select: { id: true, userId: true },
+    select: { id: true, userId: true, user: true },
   });
+
+  if (prevState.phone !== token?.user.phone) return { ...prevState, error: { formErrors: ['Invalid token'] } };
   await db.sMSToken.delete({
     where: { id: token!.id },
   });
